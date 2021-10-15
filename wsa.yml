@@ -1,0 +1,164 @@
+# Copyright (c) 2020 Cisco and/or its affiliates.
+# This software is licensed to you under the terms of the Cisco Sample
+# Code License, Version 1.1 (the "License"). You may obtain a copy of the
+# License at
+               # https://developer.cisco.com/docs/licenses
+# All use of the material herein must be in accordance with the terms of
+# the License. All rights not expressly granted by the License are
+# reserved. Unless required by applicable law or agreed to separately in
+# writing, software distributed under the License is distributed on an "AS
+# IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+# or implied.
+
+---
+- hosts: localhost
+connection: local
+gather_facts: yes
+
+#WSA
+#Create Task to retrieve a JWT
+
+vars_files:
+  - wsa_cred.yml
+  - add_urls.yml
+  - add_bypass.yml
+
+tasks:
+  - name: Authenticate and get JAVA WEB TOKEN (JWT)
+    uri:
+      url: "{{ url }}/wsa/api/v2.0/login"
+      method: POST
+      return_content: yes
+      validate_certs: no
+      headers:
+        Content-Type: "application/json"
+        Accept: "application/json"
+      body:
+        data:
+          username: "{{ username | string | base64encode }}"
+          password: "{{ password | string | base64encode }}"
+      body_format: json
+    register: token_result
+    tags:
+      - token
+
+  - name: Print result of API Token call
+    debug:
+      var: token_result.json["data"]["jwtToken"]
+    tags:
+      - token
+
+  - name: Retrieve URL categories 
+    uri:
+      url: "{{ url }}/wsa/api/configure/web_security/url_categories"
+      method: GET
+      return_content: yes
+      validate_certs: no
+      headers:
+        Content-Type: "application/json"
+        Accept: "application/json"
+        jwtToken: "{{ token_result.json['data']['jwtToken'] }}"
+    register: url_categories_result
+    tags:
+      - get-url-categories
+
+  - name: Set res_data of URL Categories call
+    set_fact:
+      res_data: "{{ url_categories_result.json['res_data'] }}"
+    tags:
+      -get-url-categories
+
+  - debug:
+      msg: "{{ item.category_name }}: {{ item.sites }}"
+    loop: "{{ res_data }}"
+    tags:
+      - get-url-categories
+
+  - name: Copy formatted results of API URL Categories call to text file
+    lineinfile:
+      path: ./url_categories_formatted.txt
+      line: "{{ item.category_name }}: {{ item.sites }}"
+      state: present
+      create: yes
+    loop: "{{ res_data }}"
+    tags:
+      - get-url-categories
+
+  - name: Add URL categories
+    uri:
+      url: "{{ url }}/wsa/api/v2.0/configure/web_security/url_categories"
+      method: PUT
+      return_content: yes
+      validate_certs: no
+      headers:
+        Content-Type: "application/json"
+        Accept: "application/json"
+        jwtToken: "{{ token_results.json['data']['jwtToken'] }}"
+      body:
+        category_name: "{{ category_name }}"
+        sites: "{{ sites }}"
+      body_format: json
+    register: url_categories_addition
+    tags:
+      - add-url-categories
+
+  - name: Print result of adding URL categories
+    debug:
+      var: url_categories_result.json
+    tags:
+      - add-url-categories
+
+  - name: Retrieve Bypass List
+    uri:
+      url: "{{ url }}/wsa/api/v2.0/configure/web_security/bypass_proxy"
+      method: GET
+      return_content: yes
+      validate_certs: no
+      headers:
+        Content-Type: "application/json"
+        Accept: "application/json"
+        jwtToken: "{{ token_result.json['data']['jwtToken'] }}"
+    register: bypass_list_result
+    tags:
+      - get-bypass-list
+
+  - name: Print result of API Bypass List Category call
+    debug: 
+      var: bypass_list_result.json
+    tags:
+      - get-bypass-list
+
+  - name: Copy formatted results of API Bypass List Categories call to text file
+    lineinfile:
+      path: ./bypass_list_formatted.txt
+      line: "{{ item }}"
+      state: present
+      create: yes
+    loop: "{{ bypass_list_result.json['res_data']['bypass_list'] }}"
+    tags:
+      -get-bypass-list
+
+  - name: Add bypass list
+    uri: 
+      url: "{{ url }}/wsa/api/v2.0/configure/web_security/bypass_proxy"
+      method: PUT
+      return_content: yes
+      validate_certs: no
+      headers:
+        Content-Type: "application/json"
+        Accept: "application/json"
+        jwtToken: "{{ token_result.json['data']['jwtToken'] }}"
+      body:
+        bypass_list: "{{ bypass_list}}"
+      body_format: json
+    register: bypass_list_addition
+    tags:
+      - add-bypass-list
+
+  - name: Print result of adding bypass list
+    debug:
+      var: bypass_list_addition.json
+    tags:
+      - add-bypass-list
+    
+...

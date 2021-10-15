@@ -1,0 +1,4 @@
+category_name: "Name of category to add sites to"
+sites:
+  - "site goes here"
+  - "site goes here"
