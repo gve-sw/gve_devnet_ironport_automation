@@ -34,9 +34,9 @@ the Web Security Appliance must be version 14.0 or newer.
 
 2. Open the **`wsa_cred.yml`** file, and with the information collected in the [Prerequisites section](##Prerequisites), fill in the values for the variables listed in the file. These include the `url`, `username`, and `password` of the web security appliance.
 
-3. (Optional) If the script is being used to add URLs to a URL Category, open the **`add_urls.yml`** file. With the information collected in the [Prerequisites section](##Prerequisites), fill in the values for the variables listed in the file. These include the `category_name` and `sites`. To add more items to the list of sites, follow the YAML format. To learn more about YAML, follow [this tutorial](https://www.tutorialspoint.com/yaml/yaml_basics.htm).
+3. (Optional) If the script is being used to add URLs to a URL Category, open the **`add_urls.yml`** file. With the information collected in the [Prerequisites section](##Prerequisites), fill in the values for the variables listed in the file. These include the `category_name` and `sites`. To add more items to the list of sites, follow the YAML format. To learn more about YAML, follow [this tutorial](https://www.tutorialspoint.com/yaml/yaml_basics.htm). It is important to note that the list of sites in the YAML file will completely replace the sites currently in the URL Category that is being changed. If the goal is to keep the existing sites in the cateogory and add some new sites, be sure to include the existing sites in the list in the add_urls.yml file.
 
-4. (Optional) If the script is being used to add URLs to the Web Proxy Bypass List, open the **`add_bypass.yml`** file. With the information collected in the [Prerequisites section](##Prerequisites), fill in the values for the variables listed in the file. This includes the `bypass_list`, which is simply the list of URLs and IP addresses that are to be added to the Web Proxy Bypass List. To add more timed to the list of sites, follow the YAML format. To learn more about YAML, follow [this tutorial](https://www.tutorialspoint.com/yaml/yaml_basics.htm).
+4. (Optional) If the script is being used to add URLs to the Web Proxy Bypass List, open the **`add_bypass.yml`** file. With the information collected in the [Prerequisites section](##Prerequisites), fill in the values for the variables listed in the file. This includes the `bypass_list`, which is simply the list of URLs and IP addresses that are to be added to the Web Proxy Bypass List. To add more timed to the list of sites, follow the YAML format. To learn more about YAML, follow [this tutorial](https://www.tutorialspoint.com/yaml/yaml_basics.htm). It is important to note that the list of sites in the YAML file will completely replace the sites currently in the Web Proxy Bypass List. If the goal is to keep the existing sites in the list and add some new sites, be sure to include the existing sites in the list in the add_bypass.yml file.
 
 5. Create a Python virtual environment and activate it (find instructions to do that [here](https://docs.python.org/3/tutorial/venv.html)).
 
@@ -78,9 +78,42 @@ To run the Ansible playbook with specific tasks:
 $ ansible-playbook wsa.yml --tags "token,[get-url-categories | add-url-categories | get-bypass-list | add-bypass-list]"
 ```
 
+## Further Documentation
+To learn more about the possible API features of the WSA, view the documentation found in the [APIDOCUMENTS](/APIDOCUMENTS/) directory. There is separate documentation for [version 12.5](/APIDOCUMENTS/wsa_12-5_api_addendum.xlsx) and [version 14.0](/APIDOCUMENTS/wsa_14-0_api_addendum.pdf)
+
 # Screenshots
 
 ![/IMAGES/0image.png](/IMAGES/0image.png)
+
+add_urls.yml content
+![/IMAGES/add-urls-content.png](/IMAGES/add-urls-content.png)
+
+add_bypass.yml content
+![/IMAGES/add-bypass-content.png](/IMAGES/add-bypass-content.png)
+
+Ansible command to add urls to URL Categories and Web Proxy Bypass List
+![/IMAGES/ansible-add-commands.png](/IMAGES/ansible-add-commands.png)
+
+Python command to add sites to URL Categories and Web Proxy Bypass List
+![/IMAGES/python-add-commands.png](/IMAGES/python-add-commands.png)
+
+Add URLs to URL Categories result on WSA GUI
+![/IMAGES/url-categories-gui.png](/IMAGES/url-categories-gui.png)
+
+Add URLs to Web Proxy Bypass List result on WSA GUI
+![/IMAGES/bypass-list-gui.png](/IMAGES/bypass-list-gui.png)
+
+Ansible command to get urls from URL Categories and Web Proxy Bypass List
+![/IMAGES/ansible-get-commands.png](/IMAGES/ansible-get-commands.png)
+
+Python command to get urls from URL Categories and Web Proxy Bypass List
+![/IMAGES/python-add-commands.png](/IMAGES/python-add-commands.png)
+
+Contents of url_categories_formatted.txt after get command
+![/IMAGES/url-categories-formatted-content.txt](/IMAGES/url-categories-formatted-content.png)
+
+Contents of bypass_list_categories_formatted.txt after get command
+![/IMAGES/bypass-list-categories-formatted-content.txt](/IMAGES/bypass-list-categories-formatted-content.png)
 
 ### LICENSE
 
